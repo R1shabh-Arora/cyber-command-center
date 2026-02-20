@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber Command Center | R1shabh</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-tertiary: #1a1a25;
+            --accent-red: #ff3860;
+            --accent-green: #00d9a5;
+            --accent-cyan: #00d9ff;
+            --accent-yellow: #ffd700;
+            --accent-purple: #b829dd;
+            --text-primary: #e0e0e0;
+            --text-secondary: #888;
+            --text-dim: #555;
+            --border: #2a2a3a;
+            --glow-red: 0 0 20px rgba(255, 56, 96, 0.3);
+            --glow-green: 0 0 20px rgba(0, 217, 165, 0.3);
+            --glow-cyan: 0 0 20px rgba(0, 217, 255, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* CRT Scanline Effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, var(--accent-red), var(--accent-cyan), var(--accent-green));
+            animation: scan 3s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-red), var(--accent-purple));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: var(--glow-red); }
+            50% { box-shadow: 0 0 30px rgba(255, 56, 96, 0.5); }
+        }
+
+        .logo-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .logo-text span {
+            color: var(--accent-red);
+        }
+
+        .status-bar {
+            display: flex;
+            gap: 2rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: blink 1s ease-in-out infinite;
+        }
+
+        .status-dot.online {
+            background: var(--accent-green);
+            box-shadow: var(--glow-green);
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Main Grid */
+        .container {
+            padding: 2rem;
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+        }
+
+        .card.alert::before { background: var(--accent-red); }
+        .card.success::before { background: var(--accent-green); }
+        .card.info::before { background: var(--accent-cyan); }
+        .card.warning::before { background: var(--accent-yellow); }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-icon {
+            font-size: 1.2rem;
+        }
+
+        .card-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+        }
+
+        .card-badge.urgent {
+            background: rgba(255, 56, 96, 0.2);
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        /* Countdown Timer */
+        .countdown {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .countdown-item {
+            text-align: center;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 1rem;
+            min-width: 80px;
+            border: 1px solid var(--border);
+        }
+
+        .countdown-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-red);
+            text-shadow: 0 0 20px rgba(255, 56, 96, 0.5);
+        }
+
+        .countdown-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            margin-top: 0.25rem;
+        }
+
+        /* Progress Bars */
+        .progress-item {
+            margin-bottom: 1rem;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .progress-fill.thm { background: var(--accent-green); width: 91%; }
+        .progress-fill.comptia { background: var(--accent-cyan); width: 65%; }
+        .progress-fill.job { background: var(--accent-purple); width: 20%; }
+
+        /* Job Listings */
+        .job-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .job-item {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .job-item:hover {
+            border-color: var(--accent-cyan);
+            background: rgba(0, 217, 255, 0.05);
+        }
+
+        .job-info h4 {
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .job-info p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .job-tag {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            background: rgba(0, 217, 165, 0.2);
+            color: var(--accent-green);
+            border: 1px solid var(--accent-green);
+        }
+
+        /* Mission Checklist */
+        .mission-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .mission-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .mission-item:hover {
+            background: var(--border);
+        }
+
+        .mission-item.completed {
+            opacity: 0.5;
+        }
+
+        .mission-item.completed .mission-text {
+            text-decoration: line-through;
+        }
+
+        .mission-checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .mission-item.completed .mission-checkbox {
+            background: var(--accent-green);
+            border-color: var(--accent-green);
+        }
+
+        .mission-priority {
+            font-size: 0.7rem;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            margin-left: auto;
+        }
+
+        .priority-high {
+            background: rgba(255, 56, 96, 0.2);
+            color: var(--accent-red);
+        }
+
+        .priority-med {
+            background: rgba(255, 215, 0, 0.2);
+            color: var(--accent-yellow);
+        }
+
+        /* Terminal */
+        .terminal {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 1rem;
+            font-size: 0.85rem;
+            height: 200px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+        }
+
+        .terminal-line {
+            margin-bottom: 0.5rem;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .terminal-prompt {
+            color: var(--accent-green);
+        }
+
+        .terminal-command {
+            color: var(--text-primary);
+        }
+
+        .terminal-output {
+            color: var(--text-secondary);
+            margin-left: 1.5rem;
+        }
+
+        .terminal-cursor {
+            display: inline-block;
+            width: 8px;
+            height: 16px;
+            background: var(--accent-cyan);
+            animation: blink 1s step-end infinite;
+            vertical-align: middle;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .stat-box {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            border-top: 1px solid var(--border);
+            margin-top: 2rem;
+        }
+
+        .footer a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-dim);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .countdown {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">⚡</div>
+            <div class="logo-text">CYBER<span>OPS</span> // COMMAND CENTER</div>
+        </div>
+        <div class="status-bar">
+            <div class="status-item">
+                <span class="status-dot online"></span>
+                <span>SYSTEM ONLINE</span>
+            </div>
+            <div class="status-item">
+                <span>🥀</span>
+                <span>Black Rose Active</span>
+            </div>
+            <div class="status-item" id="clock">
+                --:--:--
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="grid">
+            <!-- CompTIA Countdown -->
+            <div class="card alert">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span class="card-icon">⏱️</span>
+                        CompTIA Security+ Countdown
+                    </div>
+                    <span class="card-badge urgent">CRITICAL</span>
+                </div>
+                <div class="countdown" id="countdown">
+                    <div class="countdown-item">
+                        <div class="countdown-value" id="days">--</div>
+                        <div class="countdown-label">Days</div>
+                    </div>
+                    <div class="countdown-item">
+                        <div class="countdown-value" id="hours">--</div>
+                        <div class="countdown-label">Hours</div>
+                    </div>
+                    <div class="countdown-item">
+                        <div class="countdown-value" id="minutes">--</div>
+                        <div class="countdown-label">Mins</div>
+                    </div>
+                    <div class="countdown-item">
+                        <div class="countdown-value" id="seconds">--</div>
+                        <div class="countdown-label">Secs</div>
+                    </div>
+                </div>
+                <p style="text-align: center; margin-top: 1rem; color: var(--text-secondary); font-size: 0.85rem;">
+                    Target: February 28, 2026 // DEADLINE APPROACHING
+                </p>
+            </div>
+
+            <!-- TryHackMe Stats -->
+            <div class="card success">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span class="card-icon">🎯</span>
+                        TryHackMe Progress
+                    </div>
+                    <span class="card-badge">TOP 9%</span>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-value">150+</div>
+                        <div class="stat-label">Rooms Completed</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">91%</div>
+                        <div class="stat-label">Ranking Percentile</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">85+</div>
+                        <div class="stat-label">Days Streak</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">THM</div>
+                        <div class="stat-label">Rank: Hacker</div>
+                    </div>
+                </div>
+                <div class="progress-item" style="margin-top: 1rem;">
+                    <div class="progress-header">
+                        <span>Overall Progress</span>
+                        <span>91%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill thm"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Daily Missions -->
+            <div class="card info">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span class="card-icon">📋</span>
+                        Daily Missions
+                    </div>
+                    <span class="card-badge">3/5 Complete</span>
+                </div>
+                <div class="mission-list">
+                    <div class="mission-item completed" onclick="toggleMission(this)">
+                        <div class="mission-checkbox">✓</div>
+                        <span class="mission-text">Morning study block (6:00-7:30)</span>
+                        <span class="mission-priority priority-high">DONE</span>
+                    </div>
+                    <div class="mission-item completed" onclick="toggleMission(this)">
+                        <div class="mission-checkbox">✓</div>
+                        <span class="mission-text">CompTIA flashcards session</span>
+                        <span class="mission-priority priority-high">DONE</span>
+                    </div>
+                    <div class="mission-item" onclick="toggleMission(this)">
+                        <div class="mission-checkbox"></div>
+                        <span class="mission-text">Apply to 1 job posting</span>
+                        <span class="mission-priority priority-high">URGENT</span>
+                    </div>
+                    <div class="mission-item" onclick="toggleMission(this)">
+                        <div class="mission-checkbox"></div>
+                        <span class="mission-text">TryHackMe evening lab</span>
+                        <span class="mission-priority priority-med">MED</span>
+                    </div>
+                    <div class="mission-item" onclick="toggleMission(this)">
+                        <div class="mission-checkbox"></div>
+                        <span class="mission-text">Review network security concepts</span>
+                        <span class="mission-priority priority-med">MED</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Job Hunt Tracker -->
+            <div class="card warning">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span class="card-icon">💼</span>
+                        Active Applications
+                    </div>
+                    <span class="card-badge">5 New Today</span>
+                </div>
+                <div class="job-list">
+                    <div class="job-item" onclick="window.open('https://apply.workable.com/grayce/j/F0AEF82588', '_blank')">
+                        <div class="job-info">
+                            <h4>Graduate Cyber Security Analyst</h4>
+                            <p>GRAYCE • Winchester/Southampton • £28k</p>
+                        </div>
+                        <span class="job-tag">APPLY NOW</span>
+                    </div>
+                    <div class="job-item" onclick="window.open('https://uk.linkedin.com/jobs/view/junior-soc-analyst-at-addition-4371195051', '_blank')">
+                        <div class="job-info">
+                            <h4>Junior SOC Analyst</h4>
+                            <p>Addition • Farnborough • Hybrid</p>
+                        </div>
+                        <span class="job-tag">NEW</span>
+                    </div>
+                    <div class="job-item" onclick="window.open('https://uk.linkedin.com/jobs/view/cyber-security-analyst-at-leonardo-4375198040', '_blank')">
+                        <div class="job-info">
+                            <h4>Cyber Security Analyst</h4>
+                            <p>Leonardo • Bristol • Entry Level</p>
+                        </div>
+                        <span class="job-tag">NEW</span>
+                    </div>
+                </div>
+                <div class="progress-item" style="margin-top: 1rem;">
+                    <div class="progress-header">
+                        <span>Application Goal Progress</span>
+                        <span>3/15 This Month</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill job"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Study Progress -->
+            <div class="card info">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span class="card-icon">📚</span>
+                        CompTIA Study Domains
+                    </div>
+                    <span class="card-badge">65% Complete</span>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span>1.0 Threats, Attacks & Vulnerabilities</span>
+                        <span>85%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill comptia" style="width: 85%"></div>
+                    </div>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span>2.0 Architecture & Design</span>
+                        <span>70%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill comptia" style="width: 70%"></div>
+                    </div>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span>3.0 Implementation</span>
+                        <span>55%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill comptia" style="width: 55%"></div>
+                    </div>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span>4.0 Operations & Incident Response</span>
+                        <span>60%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill comptia" style="width: 60%"></div>
+                    </div>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span>5.0 Governance, Risk & Compliance</span>
+                        <span>50%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill comptia" style="width: 50%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Terminal -->
+            <div class="card" style="grid-column: span 1;">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span class="card-icon">⌨️</span>
+                        System Log
+                    </div>
+                    <span class="card-badge">LIVE</span>
+                </div>
+                <div class="terminal" id="terminal">
+                    <div class="terminal-line">
+                        <span class="terminal-prompt">root@cyber-ops:~$</span>
+                        <span class="terminal-command">./init_dashboard.sh</span>
+                    </div>
+                    <div class="terminal-output">
+                        [OK] Loading user profile: R1shabh<br>
+                        [OK] Connecting to TryHackMe API...<br>
+                        [OK] Fetching latest job listings...<br>
+                        [OK] CompTIA countdown initialized<br>
+                        [OK] Daily missions loaded<br>
+                        [WARNING] Deadline approaching: 8 days remaining<br>
+                        [INFO] Black Rose monitoring active
+                    </div>
+                    <div class="terminal-line">
+                        <span class="terminal-prompt">root@cyber-ops:~$</span>
+                        <span class="terminal-command">status</span>
+                    </div>
+                    <div class="terminal-output">
+                        System Status: OPERATIONAL<br>
+                        Study Progress: 65%<br>
+                        Job Applications: 3/15<br>
+                        THM Rank: TOP 9%<br>
+                        Clearance Eligibility: Oct 2026
+                    </div>
+                    <div class="terminal-line">
+                        <span class="terminal-prompt">root@cyber-ops:~$</span>
+                        <span class="terminal-cursor"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>Cyber Command Center v1.0 | Built with 🥀 by Black Rose</p>
+        <p>GitHub: <a href="https://github.com/R1shabh-Arora">@R1shabh-Arora</a> | TryHackMe: TOP 9%</p>
+    </footer>
+
+    <script>
+        // Clock
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').textContent = now.toLocaleTimeString('en-GB', { hour12: false });
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Countdown to Feb 28, 2026
+        function updateCountdown() {
+            const target = new Date('2026-02-28T00:00:00');
+            const now = new Date();
+            const diff = target - now;
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            document.getElementById('days').textContent = String(days).padStart(2, '0');
+            document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+            document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+            document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+        }
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // Mission toggle
+        function toggleMission(el) {
+            el.classList.toggle('completed');
+            const checkbox = el.querySelector('.mission-checkbox');
+            if (el.classList.contains('completed')) {
+                checkbox.textContent = '✓';
+            } else {
+                checkbox.textContent = '';
+            }
+        }
+
+        // Terminal typing effect
+        const terminalLines = [
+            { prompt: 'root@cyber-ops:~$', command: 'nmap -sV target.thm' },
+            { output: 'Starting Nmap scan...<br>Discovered open ports: 22, 80, 443<br>Service detection complete.' },
+            { prompt: 'root@cyber-ops:~$', command: 'gobuster dir -u http://target.thm' },
+            { output: 'Scanning directories...<br>/admin [Status: 301]<br>/api [Status: 200]<br>/config [Status: 403]' },
+        ];
+
+        let lineIndex = 0;
+        function addTerminalLine() {
+            const terminal = document.getElementById('terminal');
+            if (lineIndex < terminalLines.length) {
+                const line = terminalLines[lineIndex];
+                if (line.command) {
+                    const newLine = document.createElement('div');
+                    newLine.className = 'terminal-line';
+                    newLine.innerHTML = `<span class="terminal-prompt">${line.prompt}</span> <span class="terminal-command">${line.command}</span>`;
+                    terminal.appendChild(newLine);
+                }
+                if (line.output) {
+                    const newOutput = document.createElement('div');
+                    newOutput.className = 'terminal-output';
+                    newOutput.innerHTML = line.output;
+                    terminal.appendChild(newOutput);
+                }
+                terminal.scrollTop = terminal.scrollHeight;
+                lineIndex++;
+            }
+        }
+        setInterval(addTerminalLine, 5000);
+    </script>
+</body>
+</html>
