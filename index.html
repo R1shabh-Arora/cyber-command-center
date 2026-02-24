@@ -579,7 +579,7 @@
                     </div>
                 </div>
                 <p style="text-align: center; margin-top: 1rem; color: var(--text-secondary); font-size: 0.85rem;">
-                    Target: February 28, 2026 // DEADLINE APPROACHING
+                    Target: March 25, 2026 // ~4 WEEKS TO PREP
                 </p>
             </div>
 
@@ -778,7 +778,7 @@
                         [OK] Fetching latest job listings...<br>
                         [OK] CompTIA countdown initialized<br>
                         [OK] Daily missions loaded<br>
-                        [WARNING] Deadline approaching: 8 days remaining<br>
+                        [INFO] Deadline updated: March 25, 2026 (~29 days)<br>
                         [INFO] Black Rose monitoring active
                     </div>
                     <div class="terminal-line">
@@ -815,9 +815,9 @@
         setInterval(updateClock, 1000);
         updateClock();
 
-        // Countdown to Feb 28, 2026
+        // Countdown to March 25, 2026
         function updateCountdown() {
-            const target = new Date('2026-02-28T00:00:00');
+            const target = new Date('2026-03-25T00:00:00');
             const now = new Date();
             const diff = target - now;
 
